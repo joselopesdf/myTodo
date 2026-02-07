@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
 
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/service/local_storage.dart';
 

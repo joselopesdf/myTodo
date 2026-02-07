@@ -11,9 +11,12 @@ var storedThemeProvider = StateProvider<String>((ref) {
   return 'light';
 });
 
+var localStorageProvider = Provider( (ref) => LocalStorage.instance ) ;
+
 
 final themeProvider = NotifierProvider<ThemeNotifier,ThemeMode>(
-        ()  =>  ThemeNotifier(LocalStorage.instance)
+
+        ()  =>     ThemeNotifier(LocalStorage.instance)
 ) ;
 
 
@@ -36,14 +39,10 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   }
 
 
-  ThemeMode get themeByTime {
-
-    final hour = DateTime.now().hour;
-    return (hour >= 19 || hour < 6) ? ThemeMode.dark : ThemeMode.light;
-  }
 
 
-  void toggle() async{
+
+  void toggle({required isOpenApp}) async{
 
     await storage.toggleTheme();
 
@@ -56,15 +55,11 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   }
 
 
-  // void setLight() async {
+  // void setTheme() async {
   //
-  //   await storage.setThemeLight();
+  //   await storage.setTheme();
   // }
-  //
-  // void setDark() async {
-  //
-  //   await storage.setThemeDark();
-  // }
+
 
 
 }

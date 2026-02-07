@@ -22,7 +22,7 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
 
-  void changeTheme(){
+  void changeTheme( bool isOpening){
 
     final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
 
@@ -32,15 +32,32 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     String storedTheme = ref.read(themeProvider) == ThemeMode.light ? 'light' : 'dark';
 
-    print("tema : ${brightness.name}");
 
-    print("tema do riverpod $storedTheme");
+    if(!isOpening){
+
+      if(brightness.name != storedTheme ){
+
+        ref.read(themeProvider.notifier).toggle(isOpenApp : false);
+      }
 
 
-    if(brightness.name != storedTheme ){
-
-      ref.read(themeProvider.notifier).toggle();
     }
+
+    else {
+
+      ref.read(themeProvider.notifier).toggle(isOpenApp : true);
+
+      print("tema : ${brightness.name}");
+
+      print("tema do riverpod $storedTheme");
+
+
+
+    }
+
+
+
+
   }
 
 
@@ -58,7 +75,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     super.didChangeDependencies();
 
-    changeTheme();
+    changeTheme(false);
 
 
   }
@@ -72,7 +89,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     WidgetsBinding.instance.addObserver(this );
 
-    changeTheme();
+    changeTheme(true);
 
 
   }
@@ -184,7 +201,7 @@ class _HomePageState extends ConsumerState<HomePage>  {
             const SizedBox(height: 20),
             Switch(
               value: themeMode == ThemeMode.light,
-              onChanged: (value) => ref.read(themeProvider.notifier).toggle(),
+              onChanged: (value) => ref.read(themeProvider.notifier).toggle(isOpenApp: false),
             ),
             Text(
               t.description,

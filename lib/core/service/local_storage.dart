@@ -19,69 +19,50 @@ class LocalStorage {
   }
 
 
-  ThemeMode switchTheme(ThemeMode theme) {
 
+  ThemeMode get themeByTime {
 
-    if (theme == ThemeMode.light) return ThemeMode.light;
+    final hour = DateTime.now().hour;
+    return (hour >= 19 || hour < 7) ? ThemeMode.dark : ThemeMode.light;
 
-    if (theme == ThemeMode.dark) return ThemeMode.dark;
-
-    return ThemeMode.system;
   }
 
+ //  setTheme() async{
+ //
 
-  ThemeMode switchThemeString(String theme) {
-
-    ThemeMode newTheme = ThemeMode.light ;
-
-
-
-    if (theme ==  'light' ) {
-
-      newTheme =  ThemeMode.light ;
-
-    }
-
-    if (theme ==  'dark' ) {
-
-      newTheme =  ThemeMode.dark ;
-
-    }
-
-    if (theme ==  'system' ) {
-
-      newTheme =  ThemeMode.system ;
-
-    }
-
-    return newTheme ;
-
-
-    }
-
-
+ //
+ // await _box.put('themeMode', newTheme);
+ //
+ //  }
 
   ThemeMode get themeMode  {
 
     final stored = _box.get('themeMode');
 
 
-    if(stored == null){
-
-
-    return  ThemeMode.system  ;
-
-    }
-
     return  stored == 'dark' ? ThemeMode.dark : ThemeMode.light ;
 
 
   }
 
-  Future<void> toggleTheme()  async {
+  Future<void> toggleTheme({ bool isOpenApp = false})  async {
 
+     final themeTime  =  themeByTime ;
 
-    String newTheme = themeMode == ThemeMode.light  ?  'dark' : 'light' ;
+     String newTheme = 'light' ;
+
+     if(isOpenApp){
+
+       newTheme = themeTime == ThemeMode.dark  ?  'dark' : 'light' ;
+
+     }
+
+     else {
+
+       newTheme = themeMode == ThemeMode.light  ?  'dark' : 'light' ;
+
+     }
+
 
 
     await _box.put('themeMode', newTheme);
