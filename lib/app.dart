@@ -1,12 +1,16 @@
 
+import 'package:dev/features/login/login_repository.dart';
 import 'package:dev/features/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 
 
+import 'features/login/login_state.dart';
+import 'features/login/login_view_model.dart';
 import 'l10n/app_localizations.dart';
 import 'routes.dart';
 
@@ -21,44 +25,6 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
-
-  void changeTheme( bool isOpening){
-
-    final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
-
-    print("SYSTEM BRIGHTNESS CHANGED → $brightness");
-
-
-
-    String storedTheme = ref.read(themeProvider) == ThemeMode.light ? 'light' : 'dark';
-
-
-    if(!isOpening){
-
-      if(brightness.name != storedTheme ){
-
-        ref.read(themeProvider.notifier).toggle(isOpenApp : false);
-      }
-
-
-    }
-
-    else {
-
-      ref.read(themeProvider.notifier).toggle(isOpenApp : true);
-
-      print("tema : ${brightness.name}");
-
-      print("tema do riverpod $storedTheme");
-
-
-
-    }
-
-
-
-
-  }
 
 
   @override
@@ -75,8 +41,26 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     super.didChangeDependencies();
 
-    changeTheme(false);
+    print("change dependency MyApp Page");
 
+    final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
+    print("SYSTEM BRIGHTNESS CHANGED → $brightness");
+
+
+
+    String storedTheme = ref.read(themeProvider) == ThemeMode.light ? 'light' : 'dark';
+
+    if(brightness.name != storedTheme ){
+
+      ref.read(themeProvider.notifier).toggle();
+
+      print("tema : ${brightness.name}");
+
+      print("tema do riverpod $storedTheme");
+
+
+  }
 
   }
 
@@ -89,7 +73,33 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     WidgetsBinding.instance.addObserver(this );
 
-    changeTheme(true);
+    final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+
+    print("SYSTEM BRIGHTNESS CHANGED → $brightness");
+
+
+
+  final  currentTheme = ref.read(currentThemeTime);
+
+  final   storedTheme = ref.read(themeProvider);
+
+
+    if(currentTheme != storedTheme ) {
+
+      ref.read(themeProvider.notifier).toggle();
+    }
+
+    print("tema : ${brightness.name}");
+
+    print("tema do riverpod $storedTheme");
+
+
+  }
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("APP LIFECYCLE STATE HomePage: $state");
 
 
   }
@@ -125,112 +135,51 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage>  {
-
-
-  @override
-  void initState() {
-    super.initState();
-    print("INIT STATE HomePage");
-
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-  }
-
-  @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    print("DID UPDATE WIDGET HomePage");
-
-
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("APP LIFECYCLE STATE HomePage: $state");
-
-  }
-
-  @override
-  void didChangePlatformBrightness() {
-
-
-
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    print("DEACTIVATE HomePage");
-  }
-
-  @override
-  void dispose() {
-
-    print("DISPOSE HomePage");
-    super.dispose();
-  }
-
+class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
-    final currentLocale = ref.read(localeProvider.notifier);
-    final language = ref.watch(localeProvider);
-    final themeMode = ref.watch(themeProvider);
+    final loginViewModel = ref.read(loginNotifierProvider.notifier);
 
+    // ref.listen deve estar aqui, direto no build
+    ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
+      if (next.typeError == 'logout' && next.error != previous?.error) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(next.error ?? 'Erro ao fazer logout')),
+          );
+        });
+      }
 
+      if (next.success == 'Logout com sucesso') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/login'); // navega para login
+        });
+      }
+    });
 
     return Scaffold(
-      appBar: AppBar(title: Text(t.home_title)),
+      appBar: AppBar(title: const Text("Home Page")),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(t.hello, style: Theme.of(context).textTheme.titleLarge),
+            const Text("Bem-vindo!"),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => currentLocale.toggle(),
-              child: language.languageCode == 'pt'
-                  ? const Text("Traduzir")
-                  : const Text("Translate"),
-            ),
-            const SizedBox(height: 20),
-            Switch(
-              value: themeMode == ThemeMode.light,
-              onChanged: (value) => ref.read(themeProvider.notifier).toggle(isOpenApp: false),
-            ),
-            Text(
-              t.description,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-
             InkWell(
-              child: Text(
-                "Ir para Login",
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              onTap: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginView()),
-                );
-
+              child: const Text("Logout"),
+              onTap: () {
+                loginViewModel.logout();
               },
             ),
-
           ],
         ),
       ),
     );
   }
 }
+
+
 
 
 

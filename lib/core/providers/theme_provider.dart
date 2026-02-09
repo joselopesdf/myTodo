@@ -11,38 +11,40 @@ var storedThemeProvider = StateProvider<String>((ref) {
   return 'light';
 });
 
-var localStorageProvider = Provider( (ref) => LocalStorage.instance ) ;
+final currentThemeTime = Provider( (ref) => LocalStorage.instance.themeByTime ) ;
+
+final localStorage = Provider( (ref) => LocalStorage.instance ) ;
 
 
 final themeProvider = NotifierProvider<ThemeNotifier,ThemeMode>(
 
-        ()  =>     ThemeNotifier(LocalStorage.instance)
+        ()  =>  ThemeNotifier( )
 ) ;
 
 
 class ThemeNotifier extends Notifier<ThemeMode> {
 
-  LocalStorage storage ;
 
 
-  ThemeNotifier(this.storage);
+
+  ThemeNotifier();
 
 
   @override
   ThemeMode build()  {
 
-    var storedTheme =  storage.themeMode ;
+    final storage = ref.watch(localStorage);
 
-
-    return  storedTheme ;
+    return  storage.themeByTime ;
 
   }
 
 
 
+  void toggle() async{
 
+    final storage = ref.watch(localStorage);
 
-  void toggle({required isOpenApp}) async{
 
     await storage.toggleTheme();
 
@@ -53,12 +55,6 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 
 
   }
-
-
-  // void setTheme() async {
-  //
-  //   await storage.setTheme();
-  // }
 
 
 

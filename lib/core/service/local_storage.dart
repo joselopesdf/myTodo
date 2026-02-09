@@ -27,13 +27,6 @@ class LocalStorage {
 
   }
 
- //  setTheme() async{
- //
-
- //
- // await _box.put('themeMode', newTheme);
- //
- //  }
 
   ThemeMode get themeMode  {
 
@@ -45,25 +38,9 @@ class LocalStorage {
 
   }
 
-  Future<void> toggleTheme({ bool isOpenApp = false})  async {
+  Future<void> toggleTheme()  async {
 
-     final themeTime  =  themeByTime ;
-
-     String newTheme = 'light' ;
-
-     if(isOpenApp){
-
-       newTheme = themeTime == ThemeMode.dark  ?  'dark' : 'light' ;
-
-     }
-
-     else {
-
-       newTheme = themeMode == ThemeMode.light  ?  'dark' : 'light' ;
-
-     }
-
-
+    String   newTheme = themeMode == ThemeMode.light  ?  'dark' : 'light' ;
 
     await _box.put('themeMode', newTheme);
   }
