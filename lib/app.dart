@@ -26,7 +26,7 @@ class MyApp extends ConsumerStatefulWidget {
 
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
-  bool userLoaded = false;
+  // bool userLoaded = false;
 
 
 
@@ -74,7 +74,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
     super.initState();
     print("INIT STATE MyApp Page");
 
-    _loadUser() ;
+    // _loadUser() ;
 
 
 
@@ -114,21 +114,21 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
   }
 
-  Future<void> _loadUser() async {
-    // Carrega o usuário do LocalStorage
-    final user = await ref.read(localUserProvider.notifier).build();
-
-    if (user != null) {
-      // Atualiza o estado do AsyncNotifier corretamente
-      ref.read(localUserProvider.notifier).state = AsyncData(user);
-    } else {
-      ref.read(localUserProvider.notifier).state = const AsyncData(null);
-    }
-
-    setState(() {
-      userLoaded = true;
-    });
-  }
+  // Future<void> _loadUser() async {
+  //   // Carrega o usuário do LocalStorage
+  //   final user = await ref.read(localUserProvider.notifier).build();
+  //
+  //   if (user != null) {
+  //     // Atualiza o estado do AsyncNotifier corretamente
+  //     ref.read(localUserProvider.notifier).state = AsyncData(user);
+  //   } else {
+  //     ref.read(localUserProvider.notifier).state = const AsyncData(null);
+  //   }
+  //
+  //   setState(() {
+  //     userLoaded = true;
+  //   });
+  // }
 
 
 
@@ -138,7 +138,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeProvider);
 
-    final currentUser = ref.watch(loginProvider);
+
+    final router = ref.watch(routerProvider);
 
     final localUser = ref.watch(localUserProvider);
 
@@ -190,11 +191,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         });
       }
 
-      if ( next.isLogout  ) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/login'); // navega para login
-        });
-      }
+      // if ( next.isLogout  ) {
+      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+      //     context.go('/login'); // navega para login
+      //   });
+      // }
     });
 
     return Scaffold(
@@ -243,11 +244,11 @@ class _AdminPageState extends ConsumerState<AdminPage> {
         });
       }
 
-      if (next.isLogout) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/login');
-        });
-      }
+      // if (next.isLogout) {
+      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+      //     context.go('/login');
+      //   });
+      // }
      });
 
     return Scaffold(

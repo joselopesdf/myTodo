@@ -8,14 +8,6 @@ import '../model/hive_user_model.dart';
 import '../repository/login_repository.dart';
 
 
-final isAdminProvider = Provider<bool>((ref) {
-  final state = ref.watch(loginNotifierProvider);
-  return state.user?.role == 'admin';
-});
-
-
-
-
 final loginNotifierProvider =  NotifierProvider<LoginNotifier, LoginState>(LoginNotifier.new);
 
 

@@ -30,20 +30,20 @@ class LoginView extends ConsumerWidget {
       }
 
       // Navegar apenas quando login for bem-sucedido
-      if (next.user != null && next.user != previous?.user && next.user?.role == 'admin' ) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/admin');
-        });
-      }
-
-      else if (next.user != null && next.user != previous?.user && next.user?.role == 'user'){
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/home');
-        });
-
-
-      }
+      // if (next.user != null && next.user != previous?.user && next.user?.role == 'admin' ) {
+      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+      //     context.go('/admin');
+      //   });
+      // }
+      //
+      // else if (next.user != null && next.user != previous?.user && next.user?.role == 'user'){
+      //
+      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+      //     context.go('/home');
+      //   });
+      //
+      //
+      // }
 
 
     });
