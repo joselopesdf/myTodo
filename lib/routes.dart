@@ -5,7 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app.dart';
-import 'features/login/view/login_view.dart';
+import 'features/auth/view/login_view.dart';
+
+import 'features/home/view/pages/admin_dart.dart';
+import 'features/home/view/pages/home_dart.dart';
+
 
 final loginListenableProvider = Provider<LoginStateListenable>((ref) {
   return LoginStateListenable(ref);

@@ -1,11 +1,11 @@
 
-import 'package:dev/features/login/model/login_model.dart';
-import 'package:dev/features/login/state/login_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/local_user_provider.dart';
 import '../model/hive_user_model.dart';
+import '../model/login_model.dart';
 import '../repository/login_repository.dart';
+import '../state/login_state.dart';
 
 
 final loginNotifierProvider =  NotifierProvider<LoginNotifier, LoginState>(LoginNotifier.new);

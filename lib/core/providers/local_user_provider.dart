@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/login/model/hive_user_model.dart';
+
+import '../../features/auth/model/hive_user_model.dart';
 import '../service/local_storage.dart';
 
 final localUserProvider = AsyncNotifierProvider<LocalUserNotifier, LocalUser?>(
