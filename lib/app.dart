@@ -178,7 +178,10 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
+
     final loginViewModel = ref.read(loginNotifierProvider.notifier);
+
+    final localUser = ref.watch(localUserProvider);
 
 
     ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
@@ -204,7 +207,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Bem-vindo!"),
+            Text("Bem-vindo  ${localUser.value!.name} !"),
             const SizedBox(height: 20),
             InkWell(
               child: const Text("Logout"),
@@ -231,7 +234,10 @@ class AdminPage extends ConsumerStatefulWidget {
 class _AdminPageState extends ConsumerState<AdminPage> {
   @override
   Widget build(BuildContext context) {
+
     final loginViewModel = ref.read(loginNotifierProvider.notifier);
+
+    final localUser = ref.watch(localUserProvider);
 
 
     ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
@@ -257,7 +263,7 @@ class _AdminPageState extends ConsumerState<AdminPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Bem-vindo Admin!"),
+             Text("Bem-vindo  ${localUser.value!.name}  Admin!"),
             const SizedBox(height: 20),
             InkWell(
               child: const Text("Logout"),

@@ -52,9 +52,6 @@ class LoginNotifier extends  Notifier<LoginState> {
 
 
 
-
-
-
         final docRef = store.collection('users').doc(newUser.id);
 
         final docSnapshot = await docRef.get();
@@ -131,7 +128,6 @@ class LoginNotifier extends  Notifier<LoginState> {
   Future<void> logout() async {
 
 
-
     try {
 
 
@@ -154,7 +150,6 @@ class LoginNotifier extends  Notifier<LoginState> {
     } catch(e){
 
       state = state.copyWith(error: "Erro ao fazer logout" ,isLogout: false);
-
 
 
 
