@@ -12,7 +12,6 @@ final loginListenableProvider = Provider<LoginStateListenable>((ref) {
 });
 
 
-
 class LoginStateListenable extends ChangeNotifier {
 
   LoginStateListenable(Ref ref) {
@@ -27,6 +26,8 @@ class LoginStateListenable extends ChangeNotifier {
 
 
 final routerProvider = Provider<GoRouter>((ref) {
+
+
   return GoRouter(
 
     initialLocation: '/login',
@@ -37,6 +38,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
 
       final localUser = ref.read(localUserProvider);
+
+      if(localUser.isLoading) return null ;
 
       final user = localUser.value ;
 
@@ -62,18 +65,22 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     },
     routes: [
+
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginView(),
       ),
+
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomePage(),
       ),
+
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminPage(),
       ),
+
     ],
   );
 });

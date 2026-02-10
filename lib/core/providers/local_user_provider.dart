@@ -9,8 +9,7 @@ final localUserProvider = AsyncNotifierProvider<LocalUserNotifier, LocalUser?>(
 class LocalUserNotifier extends AsyncNotifier<LocalUser?> {
   @override
   Future<LocalUser?> build() async {
-    // Espera LocalStorage estar inicializado
-    await LocalStorage.init();
+
     final user = LocalStorage.instance.user;
     return user;
   }
