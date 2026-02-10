@@ -1,6 +1,6 @@
 
 
-import 'login_model.dart';
+import '../model/login_model.dart';
 
 
 
@@ -11,13 +11,15 @@ class LoginState  {
   final String? error;
   final String? success;
   final String? typeError ;
+  final bool isLogout ;
 
   const LoginState({
     this.isLoading = false,
     this.user,
     this.error,
     this.success,
-    this.typeError
+    this.typeError,
+    this.isLogout = false
   });
 
   LoginState copyWith({
@@ -25,14 +27,17 @@ class LoginState  {
     User? user,
     String? error,
     String? success,
-    String? typeError
+    String? typeError,
+    bool? isLogout
+
   }) {
     return LoginState(
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       error: error ?? this.error,
       success: success ?? this.success,
-      typeError: typeError ?? this.typeError
+      typeError: typeError ?? this.typeError,
+        isLogout: isLogout ?? this.isLogout
     );
   }
 

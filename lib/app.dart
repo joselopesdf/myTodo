@@ -1,16 +1,17 @@
 
-import 'package:dev/features/login/login_repository.dart';
-import 'package:dev/features/login/login_view.dart';
+import 'package:dev/features/login/repository/login_repository.dart';
+import 'package:dev/features/login/view/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'core/providers/local_user_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
 
 
-import 'features/login/login_state.dart';
-import 'features/login/login_view_model.dart';
+import 'features/login/state/login_state.dart';
+import 'features/login/viewmodel/login_view_model.dart';
 import 'l10n/app_localizations.dart';
 import 'routes.dart';
 
@@ -24,6 +25,8 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
+
+  bool userLoaded = false;
 
 
 
@@ -71,6 +74,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
     super.initState();
     print("INIT STATE MyApp Page");
 
+    _loadUser() ;
+
+
+
     WidgetsBinding.instance.addObserver(this );
 
     final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
@@ -94,6 +101,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
     print("tema do riverpod $storedTheme");
 
 
+
+
+
   }
 
 
@@ -104,6 +114,22 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
   }
 
+  Future<void> _loadUser() async {
+    // Carrega o usuário do LocalStorage
+    final user = await ref.read(localUserProvider.notifier).build();
+
+    if (user != null) {
+      // Atualiza o estado do AsyncNotifier corretamente
+      ref.read(localUserProvider.notifier).state = AsyncData(user);
+    } else {
+      ref.read(localUserProvider.notifier).state = const AsyncData(null);
+    }
+
+    setState(() {
+      userLoaded = true;
+    });
+  }
+
 
 
   @override
@@ -111,6 +137,19 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
     // Aqui você tem acesso ao ref
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeProvider);
+
+    final currentUser = ref.watch(loginProvider);
+
+    final localUser = ref.watch(localUserProvider);
+
+    // print(' ------ Usuario atual no main ------ ${currentUser.currentUser}');
+    //
+    // print(' ------ Usuario atual no main riverpod ------ ${ref.watch(loginNotifierProvider).user?.role}');
+
+    print(" -------user no hive ${localUser.value?.name} -------");
+
+
+
 
     return MaterialApp.router(
       locale: locale,
@@ -140,9 +179,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final loginViewModel = ref.read(loginNotifierProvider.notifier);
 
-    // ref.listen deve estar aqui, direto no build
+
     ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
-      if (next.typeError == 'logout' && next.error != previous?.error) {
+      if (next.error != null && next.error != previous?.error) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -151,7 +190,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         });
       }
 
-      if (next.success == 'Logout com sucesso') {
+      if ( next.isLogout  ) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.go('/login'); // navega para login
         });
@@ -178,6 +217,60 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 }
+
+
+
+class AdminPage extends ConsumerStatefulWidget {
+  const AdminPage({super.key});
+
+  @override
+  ConsumerState<AdminPage> createState() => _AdminPageState();
+}
+
+class _AdminPageState extends ConsumerState<AdminPage> {
+  @override
+  Widget build(BuildContext context) {
+    final loginViewModel = ref.read(loginNotifierProvider.notifier);
+
+
+    ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
+      if (next.error != null && next.error != previous?.error) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(next.error ?? 'Erro ao fazer logout')),
+          );
+        });
+      }
+
+      if (next.isLogout) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/login');
+        });
+      }
+     });
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Admin Page")),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Bem-vindo Admin!"),
+            const SizedBox(height: 20),
+            InkWell(
+              child: const Text("Logout"),
+              onTap: () {
+                loginViewModel.logout();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 
 

@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app.dart';
-import 'login_repository.dart';
-import 'login_state.dart';
-import 'login_view_model.dart';
+
+import '../state/login_state.dart';
+import '../viewmodel/login_view_model.dart';
 
 class LoginView extends ConsumerWidget {
   const LoginView({super.key});
@@ -31,11 +30,22 @@ class LoginView extends ConsumerWidget {
       }
 
       // Navegar apenas quando login for bem-sucedido
-      if (next.user != null && previous?.user == null) {
+      if (next.user != null && next.user != previous?.user && next.user?.role == 'admin' ) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/admin');
+        });
+      }
+
+      else if (next.user != null && next.user != previous?.user && next.user?.role == 'user'){
+
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.go('/home');
         });
+
+
       }
+
+
     });
 
 

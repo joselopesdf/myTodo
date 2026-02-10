@@ -23,18 +23,16 @@ final loginProvider = Provider <AuthRepository>( (ref) {
 
   final google = ref.watch(googleSignInProvider);
 
-  final store = ref.watch(firestoreProvider) ;
 
-  return AuthRepository(auth, google, store);
+  return AuthRepository(auth, google);
 });
 
 class AuthRepository {
   final FirebaseAuth _auth;
   final GoogleSignIn _google;
 
-  final FirebaseFirestore _store ;
 
-  AuthRepository(this._auth, this._google ,this._store);
+  AuthRepository(this._auth, this._google );
 
   Stream<User?> authStateChanges() => _auth.authStateChanges();
 
@@ -65,6 +63,8 @@ class AuthRepository {
 
       print(" usuario nome ${userCredential.user?.displayName} ") ;
 
+
+
       return userCredential.user;
     } catch (e) {
 
@@ -76,6 +76,7 @@ class AuthRepository {
 
   Future<void> signOut() async {
     try {
+
       await _google.signOut();
       await _auth.signOut();
       print('logout com sucesso');

@@ -2,11 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../features/login/model/hive_user_model.dart';
+
 class LocalStorage {
 
   LocalStorage._() ;
 
-  static late Box _box;
+  static late Box _settingsBox;
+
+  static late Box<LocalUser> _userBox;
 
   static final LocalStorage instance = LocalStorage._();
 
@@ -14,9 +18,33 @@ class LocalStorage {
   static Future<void> init() async {
 
     await Hive.initFlutter();
-    _box = await Hive.openBox('settings');
+
+    Hive.registerAdapter(LocalUserAdapter()); // registra o adapter
+    _userBox = await Hive.openBox<LocalUser>('userBox');
+
+    _settingsBox = await Hive.openBox('settings');
 
   }
+
+
+  Future<void> saveUser(LocalUser user) async {
+    await _userBox.put('currentUser', user);
+  }
+
+  Future<void> clearUser() async {
+    await _userBox.delete('currentUser');
+  }
+
+
+  LocalUser? get user {
+    final stored = _userBox.get('currentUser');
+
+    if (stored == null) return null;
+
+    return stored ;
+  }
+
+
 
 
 
@@ -30,7 +58,7 @@ class LocalStorage {
 
   ThemeMode get themeMode  {
 
-    final stored = _box.get('themeMode');
+    final stored = _settingsBox.get('themeMode');
 
 
     return  stored == 'dark' ? ThemeMode.dark : ThemeMode.light ;
@@ -42,39 +70,23 @@ class LocalStorage {
 
     String   newTheme = themeMode == ThemeMode.light  ?  'dark' : 'light' ;
 
-    await _box.put('themeMode', newTheme);
+    await _settingsBox.put('themeMode', newTheme);
   }
 
 
-
-  // Future<void> setThemeLight() async {
-  //
-  //   await _box.put('themeMode', 'light');
-  //
-  //
-  // }
-  //
-  // Future<void> setThemeDark() async {
-  //
-  //   await _box.put('themeMode', 'dark');
-  //
-  //
-  // }
-
-
   Locale get locale {
-    final stored = _box.get('locale', defaultValue: 'pt');
+    final stored = _settingsBox.get('locale', defaultValue: 'pt');
     return Locale(stored);
   }
 
   Future<void> toggleLocale() async {
     final newLocale = locale.languageCode == 'pt' ? 'en' : 'pt';
-    await _box.put('locale', newLocale);
+    await _settingsBox.put('locale', newLocale);
   }
 
 
   Future<void> setLocale(Locale newLocale) async {
-    await _box.put('locale', newLocale.languageCode);
+    await _settingsBox.put('locale', newLocale.languageCode);
   }
 
 

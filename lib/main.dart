@@ -20,6 +20,7 @@ import 'core/service/local_storage.dart';
    await LocalStorage.init();
 
     runApp(ProviderScope(child: MyApp()));
+
   }
 
 
