@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/local_user_provider.dart';
 import '../../../auth/state/login_state.dart';
@@ -33,11 +34,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         });
       }
 
-      // if ( next.isLogout  ) {
-      //   WidgetsBinding.instance.addPostFrameCallback((_) {
-      //     context.go('/login'); // navega para login
-      //   });
-      // }
+      if ( next.isLogout  ) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go('/login'); // navega para login
+        });
+      }
     });
 
     return Scaffold(

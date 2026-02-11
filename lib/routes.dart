@@ -1,10 +1,10 @@
 import 'package:dev/core/providers/local_user_provider.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'app.dart';
 import 'features/auth/view/login_view.dart';
 
 import 'features/home/view/pages/admin_dart.dart';
@@ -25,6 +25,9 @@ class LoginStateListenable extends ChangeNotifier {
       notifyListeners();
 
     });
+
+
+
   }
 }
 
@@ -41,7 +44,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     redirect: (context, state) {
 
+
+
       final localUser = ref.read(localUserProvider);
+
+
 
       if(localUser.isLoading) return null ;
 
@@ -51,6 +58,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAdmin = user?.role == 'admin';
 
       final goingTo = state.matchedLocation;
+
+
+
 
 
       // 1) Não logado → só login

@@ -137,9 +137,7 @@ class LoginNotifier extends  Notifier<LoginState> {
 
       state = state.copyWith(isLogout: true,user: null ,error: null);
 
-      await ref.read(localUserProvider.notifier).clear() ;
-
-
+      Future.microtask(() => ref.read(localUserProvider.notifier).clear());
 
       print("Usuario deslogado ${repo.currentUser?.displayName}");
 

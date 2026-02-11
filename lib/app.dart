@@ -1,12 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+
 import 'core/providers/local_user_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
-
 
 import 'l10n/app_localizations.dart';
 import 'routes.dart';
@@ -21,9 +20,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
-
-  // bool userLoaded = false;
-
 
 
   @override
@@ -98,8 +94,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
 
 
-
-
   }
 
 
@@ -109,23 +103,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
 
   }
-
-  // Future<void> _loadUser() async {
-  //   // Carrega o usuário do LocalStorage
-  //   final user = await ref.read(localUserProvider.notifier).build();
-  //
-  //   if (user != null) {
-  //     // Atualiza o estado do AsyncNotifier corretamente
-  //     ref.read(localUserProvider.notifier).state = AsyncData(user);
-  //   } else {
-  //     ref.read(localUserProvider.notifier).state = const AsyncData(null);
-  //   }
-  //
-  //   setState(() {
-  //     userLoaded = true;
-  //   });
-  // }
-
 
 
   @override
@@ -139,13 +116,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver  {
 
     final localUser = ref.watch(localUserProvider);
 
-    // print(' ------ Usuario atual no main ------ ${currentUser.currentUser}');
-    //
-    // print(' ------ Usuario atual no main riverpod ------ ${ref.watch(loginNotifierProvider).user?.role}');
-
-    print(" -------user no hive ${localUser.value?.name} -------");
-
-
+    print(" -------user no hive direto no router ${localUser.value?.name} ------- --");
 
 
     return MaterialApp.router(

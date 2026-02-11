@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 import '../../features/auth/model/hive_user_model.dart';
 
 
@@ -21,7 +20,7 @@ class LocalStorage {
     await Hive.initFlutter();
 
     Hive.registerAdapter(LocalUserAdapter()); // registra o adapter
-    _userBox = await Hive.openBox<LocalUser>('userBox');
+    _userBox = await Hive.openBox< LocalUser>('userBox');
 
     _settingsBox = await Hive.openBox('settings');
 
@@ -44,8 +43,6 @@ class LocalStorage {
 
     return stored ;
   }
-
-
 
 
 
