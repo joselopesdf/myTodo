@@ -5,13 +5,15 @@ class User {
   final String name;
   final String email;
   final String role;
+  final String? photo ;
 
   /// Construtor principal
-  User({
+  User( {
     required this.id,
     required this.name,
     required this.email,
     this.role = 'user',
+    this.photo ,
   });
 
   /// Constrói User a partir de dados do Firestore
@@ -21,6 +23,7 @@ class User {
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       role: map['role'] ?? 'user',
+      photo: map['photo']
     );
   }
 
@@ -30,6 +33,7 @@ class User {
       'name': name,
       'email': email,
       'role': role,
+      'photo':photo
     };
   }
 
@@ -39,15 +43,17 @@ class User {
     String? name,
     String? email,
     String? role,
+    String? photo
   }) {
     return User(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       role: role ?? this.role,
+      photo: photo ?? this.photo
     );
   }
 
   @override
-  String toString() => 'User(id: $id, name: $name, email: $email, role: $role)';
+  String toString() => 'User(id: $id, name: $name, email: $email, role: $role , photo : $photo)';
 }

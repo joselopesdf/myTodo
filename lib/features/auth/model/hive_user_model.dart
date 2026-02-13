@@ -17,11 +17,15 @@ class LocalUser extends HiveObject {
   @HiveField(3)
   final String role;
 
+  @HiveField(4)       // <-- novo campo
+  final String? photo;
+
   LocalUser({
     required this.id,
     required this.name,
     required this.email,
     this.role = 'user',
+    this.photo,
   });
 
   LocalUser copyWith({
@@ -29,15 +33,17 @@ class LocalUser extends HiveObject {
     String? name,
     String? email,
     String? role,
+    String? photo,
   }) {
     return LocalUser(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       role: role ?? this.role,
+      photo: photo ?? this.photo,
     );
   }
 
   @override
-  String toString() => 'LocalUser(id: $id, name: $name, email: $email, role: $role)';
+  String toString() => 'LocalUser(id: $id, name: $name, email: $email, role: $role , photo: $photo)';
 }

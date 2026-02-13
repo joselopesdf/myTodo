@@ -20,8 +20,22 @@ class LocalUserNotifier extends AsyncNotifier<LocalUser?> {
     state = AsyncData(user);
   }
 
+
+  Future<void> updateUserPhoto(String newPhotoUrl) async {
+
+    await LocalStorage.instance.updateUserPhoto(newPhotoUrl);
+
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(
+        current.copyWith(photo: newPhotoUrl),
+      );
+    }
+  }
+
   Future<void> clear() async {
     await LocalStorage.instance.clearUser();
     state = const AsyncData(null);
   }
+
 }

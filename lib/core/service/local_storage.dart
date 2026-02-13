@@ -45,6 +45,18 @@ class LocalStorage {
   }
 
 
+  Future<void> updateUserPhoto(String newPhotoUrl) async {
+
+    final currentUser = _userBox.get('currentUser');
+
+    if (currentUser == null) return;
+
+    final updatedUser = currentUser.copyWith(photo: newPhotoUrl);
+
+    await _userBox.put('currentUser', updatedUser);
+  }
+
+
 
   ThemeMode get themeByTime {
 

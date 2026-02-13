@@ -21,13 +21,14 @@ class LocalUserAdapter extends TypeAdapter<LocalUser> {
       name: fields[1] as String,
       email: fields[2] as String,
       role: fields[3] as String,
+      photo: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, LocalUser obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class LocalUserAdapter extends TypeAdapter<LocalUser> {
       ..writeByte(2)
       ..write(obj.email)
       ..writeByte(3)
-      ..write(obj.role);
+      ..write(obj.role)
+      ..writeByte(4)
+      ..write(obj.photo);
   }
 
   @override

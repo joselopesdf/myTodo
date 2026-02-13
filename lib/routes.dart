@@ -1,4 +1,5 @@
 import 'package:dev/core/providers/local_user_provider.dart';
+import 'package:dev/features/home/widgets/profile_picture.dart';
 
 import 'package:flutter/material.dart';
 
@@ -10,58 +11,35 @@ import 'features/auth/view/login_view.dart';
 import 'features/home/view/pages/admin_dart.dart';
 import 'features/home/view/pages/home_dart.dart';
 
-
 final loginListenableProvider = Provider<LoginStateListenable>((ref) {
   return LoginStateListenable(ref);
 });
 
-
 class LoginStateListenable extends ChangeNotifier {
-
   LoginStateListenable(Ref ref) {
-
     ref.listen(localUserProvider, (_, __) {
-
       notifyListeners();
-
     });
-
-
-
   }
 }
 
-
 final routerProvider = Provider<GoRouter>((ref) {
-
-
   return GoRouter(
-
     initialLocation: '/login',
 
     refreshListenable: ref.read(loginListenableProvider),
 
-
     redirect: (context, state) {
-
-
-
       final localUser = ref.read(localUserProvider);
 
+      if (localUser.isLoading) return null;
 
-
-      if(localUser.isLoading) return null ;
-
-      final user = localUser.value ;
+      final user = localUser.value;
 
       final loggedIn = user != null;
       final isAdmin = user?.role == 'admin';
 
       final goingTo = state.matchedLocation;
-
-
-
-
 
       // 1) Não logado → só login
       if (!loggedIn && goingTo != '/login') return '/login';
@@ -76,26 +54,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (loggedIn && isAdmin && goingTo == '/home') return '/admin';
 
       return null; // tudo certo
-
     },
     routes: [
+      GoRoute(path: '/login', builder: (context, state) => const LoginView()),
 
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginView(),
-      ),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
 
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomePage(),
-      ),
+      GoRoute(path: '/admin', builder: (context, state) => const AdminPage()),
 
-      GoRoute(
-        path: '/admin',
-        builder: (context, state) => const AdminPage(),
-      ),
-
+      // GoRoute(
+      //   path: '/profile',
+      //   builder: (context, state) => const ProfileImagePicker(),
+      // ),
     ],
   );
 });
-

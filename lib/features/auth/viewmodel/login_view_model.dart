@@ -48,7 +48,7 @@ class LoginNotifier extends  Notifier<LoginState> {
        else {
 
 
-        User  newUser  = User(name: user.displayName ?? '',email: user.email ?? '' ,id:  user.uid );
+        User  newUser  = User(name: user.displayName ?? '',email: user.email ?? '' ,id:  user.uid ,photo: user.photoURL );
 
 
 
@@ -68,7 +68,8 @@ class LoginNotifier extends  Notifier<LoginState> {
               id: newUser.id,
               name: newUser.name,
               email: newUser.email,
-              role: newUser.role
+              role: newUser.role,
+              photo: newUser.photo
             ),
           );
 
@@ -79,14 +80,15 @@ class LoginNotifier extends  Notifier<LoginState> {
 
 
 
-       newUser = newUser.copyWith(role:userFirebase.role,email: userFirebase.email ,name: userFirebase.name );
+       newUser = newUser.copyWith(role:userFirebase.role,email: userFirebase.email ,name: userFirebase.name , photo:  userFirebase.photo );
 
           await ref.read(localUserProvider.notifier).save(
             LocalUser(
               id: newUser.id,
               name: newUser.name,
               email: newUser.email,
-              role: newUser.role
+              role: newUser.role,
+              photo: newUser.photo
             ),
           );
 
@@ -143,12 +145,11 @@ class LoginNotifier extends  Notifier<LoginState> {
 
       print("Usuario atual ${repo.currentUser}");
 
-      print("deslogado com sucesso dados ${state.user!.email} ---  ${state.user!.role}");
+
 
     } catch(e){
 
-      state = state.copyWith(error: "Erro ao fazer logout" ,isLogout: false);
-
+      state = state.copyWith(error: e.toString() ,isLogout: false);
 
 
     }
