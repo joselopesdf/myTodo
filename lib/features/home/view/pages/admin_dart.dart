@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dev/features/home/repository/task_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/widget/online.dart';
 import '../../../auth/state/login_state.dart';
 import '../../../auth/viewmodel/login_view_model.dart';
+import '../../widgets/create_task_form.dart';
 import '../../widgets/profile_image.dart';
 import '../../widgets/profile_picture.dart';
 import '../../widgets/show_profile_picker.dart';
@@ -29,6 +31,8 @@ class _AdminPageState extends ConsumerState<AdminPage> {
     final localUser = ref.watch(
       localUserProvider.select((value) => value.value?.photo),
     );
+
+    // DEBUG
 
     ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
       if (next.error != null && next.error != previous?.error) {
@@ -80,6 +84,8 @@ class _AdminPageState extends ConsumerState<AdminPage> {
           children: [
             // Text("Bem-vindo  ${localUser.value?.name}  Admin!"),
             const SizedBox(height: 20),
+
+            CreateTaskForm(),
           ],
         ),
       ),

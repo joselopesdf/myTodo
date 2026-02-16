@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/local_user_provider.dart';
-import '../../../core/utils/check_conection.dart';
+
 import '../../auth/repository/login_repository.dart';
 import '../state/upload_state.dart';
 

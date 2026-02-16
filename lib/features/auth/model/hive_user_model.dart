@@ -1,9 +1,8 @@
-
 import 'package:hive/hive.dart';
 
 part 'hive_user_model.g.dart'; // necessário para o adapter ser gerado
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 0)
 class LocalUser extends HiveObject {
   @HiveField(0)
   final String id;
@@ -17,7 +16,7 @@ class LocalUser extends HiveObject {
   @HiveField(3)
   final String role;
 
-  @HiveField(4)       // <-- novo campo
+  @HiveField(4) // <-- novo campo
   final String? photo;
 
   LocalUser({
@@ -45,5 +44,6 @@ class LocalUser extends HiveObject {
   }
 
   @override
-  String toString() => 'LocalUser(id: $id, name: $name, email: $email, role: $role , photo: $photo)';
+  String toString() =>
+      'LocalUser(id: $id, name: $name, email: $email, role: $role , photo: $photo)';
 }
