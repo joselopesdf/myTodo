@@ -1,17 +1,21 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dev/features/home/repository/task_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../../../../core/providers/local_user_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/widget/online.dart';
+import '../../../auth/model/hive_user_model.dart';
+import '../../../auth/repository/users_repository.dart';
 import '../../../auth/state/login_state.dart';
 import '../../../auth/viewmodel/login_view_model.dart';
+import '../../repository/task_repository.dart';
+import '../../viewmodel/task_view_model.dart';
 import '../../widgets/create_task_form.dart';
 import '../../widgets/profile_image.dart';
 import '../../widgets/profile_picture.dart';
+import '../../widgets/showAddTask.dart';
 import '../../widgets/show_profile_picker.dart';
 
 class AdminPage extends ConsumerStatefulWidget {
@@ -28,9 +32,35 @@ class _AdminPageState extends ConsumerState<AdminPage> {
 
     final themeMode = ref.watch(themeProvider);
 
-    final localUser = ref.watch(
-      localUserProvider.select((value) => value.value?.photo),
+    final localUser = ref.watch(localUserProvider);
+
+    final firestoreTasks = ref.watch(
+      adminTasksProvider(localUser.value?.id ?? ''),
     );
+
+    void printLocalTasks() async {
+      final repo = ref.read(taskLocalRepositoryProvider); // pega o repo
+      final localTasks = await repo
+          .getLocalTasks(); // espera o Future completar
+
+      if (localTasks.isNotEmpty) {
+        print("total de tarefas locais: ${localTasks.length}");
+        for (final task in localTasks) {
+          print("Tarefa local: ${task.title}, isSynced: ${task.isSynced}");
+        }
+      } else {
+        print("Nenhuma tarefa local");
+      }
+    }
+
+    printLocalTasks();
+
+    if (firestoreTasks.value?.isNotEmpty == true) {
+      print("total de tarefas firebase: ${firestoreTasks.value?.length}");
+      firestoreTasks.value?.forEach((task) {
+        print("Tarefa firebase: ${task.title}, isSynced: ${task.isSynced}");
+      });
+    }
 
     // DEBUG
 
@@ -51,15 +81,32 @@ class _AdminPageState extends ConsumerState<AdminPage> {
       }
     });
 
+    ref.listen<AsyncValue<LocalUser?>>(localUserProvider, (prev, next) async {
+      final user = next.value;
+      if (user != null) {
+        print("🔄 Registrando WorkManager para ownerId: ${user.id}");
+
+        await Workmanager().registerOneOffTask(
+          "syncTasksId",
+          "syncTasks",
+          inputData: {"ownerId": user.id},
+          constraints: Constraints(
+            networkType: NetworkType.connected,
+            requiresBatteryNotLow: true,
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Admin Page"),
         actions: [
           ElevatedButton(
             onPressed: () {
-              showProfileImagePickerDialog(context, ref);
+              showAddTask(context, ref);
             },
-            child: Icon(Icons.person),
+            child: Icon(Icons.add),
           ),
 
           ConnectionStatusDot(),
@@ -69,7 +116,12 @@ class _AdminPageState extends ConsumerState<AdminPage> {
             onChanged: (value) => ref.read(themeProvider.notifier).toggle(),
           ),
 
-          ProfileImage(radius: 30),
+          GestureDetector(
+            child: ProfileImage(radius: 30),
+            onTap: () {
+              showProfileImagePickerDialog(context, ref);
+            },
+          ),
           InkWell(
             child: Icon(Icons.logout),
             onTap: () {
@@ -78,17 +130,44 @@ class _AdminPageState extends ConsumerState<AdminPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Text("Bem-vindo  ${localUser.value?.name}  Admin!"),
-            const SizedBox(height: 20),
+      body: Consumer(
+        builder: (context, ref, _) {
+          final adminTasks = ref.watch(
+            adminTasksProvider(localUser.value?.id ?? ''),
+          );
 
-            CreateTaskForm(),
-          ],
-        ),
+          if (adminTasks.value?.isEmpty == true) {
+            return const Center(
+              child: Text('Nenhuma tarefa encontrada para este admin.'),
+            );
+          }
+
+          return adminTasks.when(
+            data: (task) => ListView.builder(
+              shrinkWrap: true,
+              itemCount: task.length,
+
+              itemBuilder: (context, index) {
+                final tasks = task[index];
+                return ListTile(
+                  title: Text(tasks.title),
+                  subtitle: Text(tasks.description),
+                  trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
+                );
+              },
+            ),
+
+            loading: () => const Center(child: CircularProgressIndicator()),
+
+            error: (e, _) => Center(child: Text('Erro: $e')),
+          );
+        },
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 }

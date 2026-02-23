@@ -50,6 +50,10 @@ class LocalStorage {
     return _taskBox.values.toList();
   }
 
+  Future<bool> existsLocalTask(String taskId) async {
+    return _taskBox.containsKey(taskId);
+  }
+
   Future<void> updateLocalTask(Task updatedTask) async {
     if (_taskBox.containsKey(updatedTask.id)) {
       await _taskBox.put(updatedTask.id, updatedTask.copyWith(isSynced: false));
@@ -87,7 +91,9 @@ class LocalStorage {
   }
 
   ThemeMode get themeByTime {
-    final hour = DateTime.now().hour;
+    final hour = DateTime
+        .now()
+        .hour;
     return (hour >= 19 || hour < 7) ? ThemeMode.dark : ThemeMode.light;
   }
 
@@ -116,4 +122,5 @@ class LocalStorage {
   Future<void> setLocale(Locale newLocale) async {
     await _settingsBox.put('locale', newLocale.languageCode);
   }
+
 }

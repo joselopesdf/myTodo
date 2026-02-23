@@ -1,10 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dev/features/home/repository/task_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../../../core/providers/local_user_provider.dart';
 import '../model/hive_user_model.dart';
 import '../model/login_model.dart';
 import '../repository/login_repository.dart';
+import '../repository/users_repository.dart';
 import '../state/login_state.dart';
+
+final normalUsersProvider = StreamProvider<List<User>>((ref) {
+  return getNormalUsers();
+});
 
 final loginNotifierProvider = NotifierProvider<LoginNotifier, LoginState>(
   LoginNotifier.new,
@@ -119,9 +127,13 @@ class LoginNotifier extends Notifier<LoginState> {
 
       await repo.signOut();
 
+      await Workmanager().cancelAll();
+
       state = state.copyWith(isLogout: true, user: null, error: null);
 
-      Future.microtask(() => ref.read(localUserProvider.notifier).clear());
+      await ref.read(localUserProvider.notifier).clear();
+
+      await ref.read(taskLocalRepositoryProvider).clearLocalTasks();
 
       print("Usuario deslogado ${repo.currentUser?.displayName}");
 

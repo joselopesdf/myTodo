@@ -1,3 +1,4 @@
+import 'package:dev/features/home/state/upload_state.dart';
 import 'package:dev/features/home/widgets/profile_picture.dart';
 
 import 'package:flutter/material.dart';
@@ -14,37 +15,42 @@ Future<void> showProfileImagePickerDialog(
     barrierDismissible: false,
     // evita fechar tocando fora
     builder: (context) {
+      final uploadState = ref.watch(profileUploadProvider);
+
       return AlertDialog(
+        alignment: Alignment.center,
+
         content: SizedBox(
           width: MediaQuery.of(context).size.width * 0.8,
           height: MediaQuery.of(context).size.height * 0.4,
 
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+          child: uploadState is! UploadLoading
+              ? SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
 
-              children: [
-                ProfileImagePicker(),
+                    children: [
+                      ProfileImagePicker(),
 
-                const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        ref.read(profileUploadProvider.notifier).reset();
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Cancelar"),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ), // seu widget original
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              ref.read(profileUploadProvider.notifier).reset();
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Cancelar"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : const Center(child: CircularProgressIndicator()),
+          // seu widget original
+        ),
       );
     },
   );

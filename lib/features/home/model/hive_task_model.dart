@@ -67,6 +67,7 @@ class Task extends HiveObject {
 
   // criação a partir de Map (Firebase)
   factory Task.fromMap(Map<String, dynamic> map, String id) => Task(
+    isSynced: true,
     id: id,
     title: map['title'],
     description: map['description'],

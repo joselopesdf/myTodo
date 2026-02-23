@@ -1,9 +1,6 @@
 import 'package:dev/features/home/model/hive_task_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../core/providers/connection_provider.dart';
-import '../../auth/repository/login_repository.dart';
-
 import '../repository/task_repository.dart';
 
 // Todas as tasks do usuário (normal) ou admin (dono)
@@ -18,6 +15,14 @@ final adminTasksProvider = StreamProvider.family<List<Task>, String>((
 ) {
   final repo = ref.watch(taskRepositoryProvider);
   return repo.getTasksForOwner(ownerId);
+});
+
+final adminLocalTasksProvider = StreamProvider.family<List<Task>, String>((
+  ref,
+  ownerId,
+) {
+  final repo = ref.watch(taskRepositoryProvider);
+  return repo.getLocalTasksStream(ownerId);
 });
 
 final taskViewModel = AsyncNotifierProvider(TaskViewModel.new);
@@ -49,5 +54,9 @@ class TaskViewModel extends AsyncNotifier<bool> {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  void reset() {
+    state = const AsyncValue.data(false);
   }
 }

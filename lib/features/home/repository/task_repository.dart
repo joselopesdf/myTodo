@@ -43,6 +43,27 @@ class TaskRepository {
         );
   }
 
+  Stream<List<Task>> getLocalTasksStream(String ownerId) async* {
+    final localRepo = LocalStorage.instance;
+
+    // Ouve Firestore em tempo real
+    final firestoreStream = getTasksForOwner(ownerId);
+
+    await for (final firestoreTasks in firestoreStream) {
+      if (firestoreTasks.isNotEmpty) {
+        // Salva no Hive apenas se houver algo novo
+        for (final task in firestoreTasks) {
+          if (!await localRepo.existsLocalTask(task.id)) {
+            await localRepo.saveLocalTask(task.copyWith(isSynced: true));
+          }
+        }
+      }
+
+      // Sempre retorna o que tiver no Hive, mesmo que Firestore esteja vazio
+      yield await localRepo.getLocalTasks();
+    }
+  }
+
   Stream<List<Task>> getTasksForUser(String userId) {
     return tasks
         .where('assignedUserIds', arrayContains: userId) // mesmo nome do map
