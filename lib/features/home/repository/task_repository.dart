@@ -4,6 +4,9 @@ import 'package:dev/features/auth/repository/login_repository.dart';
 import 'package:dev/features/home/model/hive_task_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../auth/model/hive_user_model.dart';
+import '../../auth/model/login_model.dart';
+
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {
   final firestore = ref.watch(firestoreProvider);
   return TaskRepository(firestore);
@@ -15,6 +18,8 @@ class TaskRepository {
   TaskRepository(this.firestore);
 
   CollectionReference get tasks => firestore.collection('tasks');
+
+  CollectionReference get users => firestore.collection('users');
 
   Future<void> createTask(Task task) async {
     await tasks.doc(task.id).set(task.toMap());
@@ -77,6 +82,42 @@ class TaskRepository {
               )
               .toList(),
         );
+  }
+
+  Future<Task?> getTask(String taskId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(taskId)
+        .get();
+
+    if (!doc.exists) return null;
+
+    return Task.fromMap(doc.data()!, doc.id);
+  }
+
+  Stream<List<User>> getUsersFromTask(String taskId) async* {
+    // 1️⃣ Buscar a task
+    final task = await getTask(taskId);
+    if (task == null) {
+      yield [];
+      return;
+    }
+
+    final ids = task.assignedUserIds;
+
+    if (ids.isEmpty) {
+      yield [];
+      return;
+    }
+
+    // 2️⃣ Buscar users com where in
+    yield* FirebaseFirestore.instance
+        .collection('users')
+        .where('id', whereIn: ids) // <= funciona com até 10 IDs
+        .snapshots()
+        .map((snap) {
+          return snap.docs.map((d) => User.fromMap(d, id: d.id)).toList();
+        });
   }
 }
 

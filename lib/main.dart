@@ -5,6 +5,7 @@ import 'package:workmanager/workmanager.dart';
 
 import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'core/service/background_storage.dart';
 import 'core/service/sincronizeTasks.dart';
 import 'features/home/repository/task_repository.dart';
 import 'firebase_options.dart';
@@ -16,9 +17,15 @@ void callbackDispatcher() {
   Workmanager().executeTask((task, input) async {
     print("🔥 Rodando em background: $task");
 
-    if (task == 'syncTasks') {
-      final ownerId = input?['ownerId'] ?? LocalStorage.instance.user?.id ?? '';
+    await Firebase.initializeApp();
 
+    final inputOwner = input?['ownerId'];
+
+    final hiveUser = await BackgroundLocalStorage.getUser();
+
+    final ownerId = inputOwner ?? hiveUser?.id ?? '';
+
+    if (task == 'syncTasks') {
       if (ownerId.isNotEmpty) {
         await SyncService(
           repository: TaskRepository(FirebaseFirestore.instance),
@@ -45,7 +52,6 @@ void main() async {
     isInDebugMode: true,
     // deixe true até funcionar
   );
-
 
   runApp(ProviderScope(child: MyApp()));
 }

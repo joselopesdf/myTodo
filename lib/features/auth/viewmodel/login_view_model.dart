@@ -127,7 +127,7 @@ class LoginNotifier extends Notifier<LoginState> {
 
       await repo.signOut();
 
-      await Workmanager().cancelAll();
+      await Workmanager().cancelByTag("sync-tasks");
 
       state = state.copyWith(isLogout: true, user: null, error: null);
 

@@ -7,14 +7,14 @@ import '../../../../core/providers/local_user_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/widget/online.dart';
 import '../../../auth/model/hive_user_model.dart';
-import '../../../auth/repository/users_repository.dart';
+
 import '../../../auth/state/login_state.dart';
 import '../../../auth/viewmodel/login_view_model.dart';
 import '../../repository/task_repository.dart';
 import '../../viewmodel/task_view_model.dart';
-import '../../widgets/create_task_form.dart';
+
 import '../../widgets/profile_image.dart';
-import '../../widgets/profile_picture.dart';
+
 import '../../widgets/showAddTask.dart';
 import '../../widgets/show_profile_picker.dart';
 
@@ -53,6 +53,25 @@ class _AdminPageState extends ConsumerState<AdminPage> {
       }
     }
 
+    void syncOfflineTasks() async {
+      final repo = ref.read(taskLocalRepositoryProvider);
+
+      final localTasks = await repo.getLocalTasks();
+
+      final repoRemote = ref.read(
+        adminTasksProvider(localUser.value?.id ?? ''),
+      );
+
+      final serverTasks = repoRemote.value ?? [];
+
+      if (serverTasks.isNotEmpty && localTasks.isEmpty) {
+        for (final task in serverTasks) {
+          await repo.saveLocalTask(task.copyWith(isSynced: true));
+        }
+      }
+    }
+
+    syncOfflineTasks();
     printLocalTasks();
 
     if (firestoreTasks.value?.isNotEmpty == true) {
@@ -78,23 +97,6 @@ class _AdminPageState extends ConsumerState<AdminPage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.go('/login');
         });
-      }
-    });
-
-    ref.listen<AsyncValue<LocalUser?>>(localUserProvider, (prev, next) async {
-      final user = next.value;
-      if (user != null) {
-        print("🔄 Registrando WorkManager para ownerId: ${user.id}");
-
-        await Workmanager().registerOneOffTask(
-          "syncTasksId",
-          "syncTasks",
-          inputData: {"ownerId": user.id},
-          constraints: Constraints(
-            networkType: NetworkType.connected,
-            requiresBatteryNotLow: true,
-          ),
-        );
       }
     });
 
@@ -149,10 +151,31 @@ class _AdminPageState extends ConsumerState<AdminPage> {
 
               itemBuilder: (context, index) {
                 final tasks = task[index];
-                return ListTile(
-                  title: Text(tasks.title),
-                  subtitle: Text(tasks.description),
-                  trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
+
+                final userForTask = ref.watch(
+                  getUsersFromTaskProvider(tasks.id),
+                );
+
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(tasks.title),
+                      subtitle: Text(tasks.description),
+                      trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
+                    ),
+
+                    userForTask.when(
+                      data: (users) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Text(
+                          'Responsáveis: ${users.map((u) => u.email).join(', ')}',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      loading: () => const CircularProgressIndicator(),
+                      error: (e, _) => Text('Erro ao carregar usuários: $e'),
+                    ),
+                  ],
                 );
               },
             ),
