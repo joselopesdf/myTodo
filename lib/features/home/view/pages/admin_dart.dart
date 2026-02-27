@@ -71,7 +71,7 @@ class _AdminPageState extends ConsumerState<AdminPage> {
       }
     }
 
-    syncOfflineTasks();
+    // syncOfflineTasks();
     printLocalTasks();
 
     if (firestoreTasks.value?.isNotEmpty == true) {
@@ -145,40 +145,44 @@ class _AdminPageState extends ConsumerState<AdminPage> {
           }
 
           return adminTasks.when(
-            data: (task) => ListView.builder(
-              shrinkWrap: true,
-              itemCount: task.length,
+            data: (task) =>
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: task.length,
 
-              itemBuilder: (context, index) {
-                final tasks = task[index];
+                  itemBuilder: (context, index) {
+                    final tasks = task[index];
 
-                final userForTask = ref.watch(
-                  getUsersFromTaskProvider(tasks.id),
-                );
+                    final userForTask = ref.watch(
+                      getUsersFromTaskProvider(tasks.id),
+                    );
 
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(tasks.title),
-                      subtitle: Text(tasks.description),
-                      trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
-                    ),
-
-                    userForTask.when(
-                      data: (users) => Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Text(
-                          'Responsáveis: ${users.map((u) => u.email).join(', ')}',
-                          style: TextStyle(fontStyle: FontStyle.italic),
+                    return Column(
+                      children: [
+                        ListTile(
+                          title: Text(tasks.title),
+                          subtitle: Text(tasks.description),
+                          trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
                         ),
-                      ),
-                      loading: () => const CircularProgressIndicator(),
-                      error: (e, _) => Text('Erro ao carregar usuários: $e'),
-                    ),
-                  ],
-                );
-              },
-            ),
+
+                        userForTask.when(
+                          data: (users) =>
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0),
+                                child: Text(
+                                  'Responsáveis: ${users.map((u) => u.email)
+                                      .join(', ')}',
+                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                          loading: () => const CircularProgressIndicator(),
+                          error: (e, _) =>
+                              Text('Erro ao carregar usuários: $e'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
 
             loading: () => const Center(child: CircularProgressIndicator()),
 

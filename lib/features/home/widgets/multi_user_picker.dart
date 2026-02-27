@@ -44,7 +44,7 @@ class _MultiUserPickerState extends ConsumerState<MultiUserPicker> {
                   .map((u) => MultiSelectItem<User>(u, u.name))
                   .toList(),
               initialValue: selectedUsers,
-              searchable: true,
+              searchable: false,
               title: const Text("Selecionar responsáveis"),
               confirmText: const Text("OK"),
               cancelText: const Text("Cancelar"),
