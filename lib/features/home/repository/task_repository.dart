@@ -4,7 +4,6 @@ import 'package:dev/features/auth/repository/login_repository.dart';
 import 'package:dev/features/home/model/hive_task_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../auth/model/hive_user_model.dart';
 import '../../auth/model/login_model.dart';
 
 final taskRepositoryProvider = Provider<TaskRepository>((ref) {
@@ -113,7 +112,7 @@ class TaskRepository {
     // 2️⃣ Buscar users com where in
     yield* FirebaseFirestore.instance
         .collection('users')
-        .where('id', whereIn: ids) // <= funciona com até 10 IDs
+        .where(FieldPath.documentId, whereIn: ids) // <= funciona com até 10 IDs
         .snapshots()
         .map((snap) {
           return snap.docs.map((d) => User.fromMap(d, id: d.id)).toList();

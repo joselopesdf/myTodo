@@ -25,6 +25,16 @@ class SyncService {
     // 🔹 Sincronização normal: do Hive para Firestore
     final firestoreIds = firestoreTasks.map((t) => t.id).toSet();
 
+    final hiveIds = localTasks.map((t) => t.id).toSet();
+
+    if (localTasks.length > firestoreTasks.length) {
+      for (var localId in hiveIds) {
+        if (!firestoreIds.contains(localId)) {
+          localRepo.deleteLocalTask(localId);
+        }
+      }
+    }
+
     for (final task in localTasks) {
       if (!task.isSynced) {
         await repository.createTask(task);

@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../../../core/providers/connection_provider.dart';
 import '../../../../core/providers/local_user_provider.dart';
 import '../../../../core/providers/theme_provider.dart';
+import '../../../../core/service/local_storage.dart';
+import '../../../../core/service/sincronizeTasks.dart';
 import '../../../../core/widget/online.dart';
 import '../../../auth/model/hive_user_model.dart';
 
@@ -145,44 +149,44 @@ class _AdminPageState extends ConsumerState<AdminPage> {
           }
 
           return adminTasks.when(
-            data: (task) =>
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: task.length,
+            data: (task) => ListView.builder(
+              shrinkWrap: true,
+              itemCount: task.length,
 
-                  itemBuilder: (context, index) {
-                    final tasks = task[index];
+              itemBuilder: (context, index) {
+                final tasks = task[index];
 
-                    final userForTask = ref.watch(
-                      getUsersFromTaskProvider(tasks.id),
-                    );
+                final userForTask = ref.watch(
+                  getUsersFromTaskProvider(tasks.id),
+                );
 
-                    return Column(
-                      children: [
-                        ListTile(
-                          title: Text(tasks.title),
-                          subtitle: Text(tasks.description),
-                          trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
+                print("usuarios ${userForTask.value?.length}");
+
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(tasks.title),
+                      subtitle: Text(tasks.description),
+                      trailing: Text('Due: ${tasks.dueDate?.toLocal()}'),
+                    ),
+
+                    SizedBox(),
+
+                    userForTask.when(
+                      data: (users) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Text(
+                          'Responsáveis: ${users.map((u) => u.email).join(', ')}',
+                          style: TextStyle(fontStyle: FontStyle.italic),
                         ),
-
-                        userForTask.when(
-                          data: (users) =>
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Text(
-                                  'Responsáveis: ${users.map((u) => u.email)
-                                      .join(', ')}',
-                                  style: TextStyle(fontStyle: FontStyle.italic),
-                                ),
-                              ),
-                          loading: () => const CircularProgressIndicator(),
-                          error: (e, _) =>
-                              Text('Erro ao carregar usuários: $e'),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                      loading: () => const CircularProgressIndicator(),
+                      error: (e, _) => Text('Erro ao carregar usuários: $e'),
+                    ),
+                  ],
+                );
+              },
+            ),
 
             loading: () => const Center(child: CircularProgressIndicator()),
 
@@ -196,5 +200,11 @@ class _AdminPageState extends ConsumerState<AdminPage> {
   @override
   void initState() {
     super.initState();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   if (ref.read(isOnlineProvider)) {
+    //     await setupBackgroundSync();
+    //   }
+    // });
   }
 }

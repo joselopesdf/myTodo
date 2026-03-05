@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/providers/connection_provider.dart';
 import 'core/providers/local_user_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/service/sincronizeTasks.dart';
 import 'core/theme/app_theme.dart';
 
+import 'features/home/repository/task_repository.dart';
 import 'l10n/app_localizations.dart';
 import 'routes.dart';
 
@@ -74,10 +78,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     print("tema do riverpod $storedTheme");
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("APP LIFECYCLE STATE HomePage: $state");
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   print("APP LIFECYCLE STATE HomePage: $state");
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -104,5 +108,30 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       themeMode: themeMode,
       title: 'Flutter Demo',
     );
+  }
+
+  Future<void> setupBackgroundSync(String id) async {
+    await SyncService(
+      repository: TaskRepository(FirebaseFirestore.instance),
+    ).syncTasks(id ?? '');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("APP LIFECYCLE STATE APP : $state");
+
+    final isOnline = ref.watch(isOnlineProvider);
+
+    final localUser = ref.watch(localUserProvider);
+
+    if (state == AppLifecycleState.resumed) {
+      if (isOnline) {
+        localUser.value!.id.isNotEmpty
+            ? setupBackgroundSync(localUser.value?.id ?? '')
+            : null;
+
+        print('sincronizacao de dados feito ');
+      }
+    }
   }
 }
