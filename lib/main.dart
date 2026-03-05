@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dev/core/service/logger_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -68,5 +68,5 @@ void main() async {
 
   Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
-  runApp(ProviderScope(child: MyApp()));
+  runApp(ProviderScope(observers: [LoggerObserver()], child: MyApp()));
 }
